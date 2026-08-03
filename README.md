@@ -1,56 +1,53 @@
-index.html
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PitPlanner Shift Handover</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PitPlanner Shift Handover</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            padding: 15px;
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background:#f2f2f2;
+    padding:15px;
+}
 
-        h1 {
-            text-align: center;
-        }
+.card {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:15px;
+}
 
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
+input, textarea, select {
+    width:100%;
+    padding:12px;
+    margin:8px 0 15px;
+    box-sizing:border-box;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
 
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            margin-top: 8px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
+textarea {
+    height:80px;
+}
 
-        textarea {
-            height: 100px;
-        }
+button {
+    width:100%;
+    padding:15px;
+    background:#0066cc;
+    color:white;
+    border:0;
+    border-radius:8px;
+    font-size:18px;
+}
 
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-        }
+.issue {
+    border-left:5px solid #0066cc;
+    padding-left:10px;
+    margin-bottom:15px;
+}
+</style>
 
-        .priority {
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
@@ -61,48 +58,106 @@ index.html
 <div class="card">
 
 <label>Equipment Number</label>
-<input type="text" placeholder="Example: 793F-12">
+<input id="equipment" placeholder="Example: 793F-12">
 
 <label>Location</label>
-<input type="text" placeholder="Example: ROM / Workshop">
+<input id="location" placeholder="Example: ROM">
 
 <label>Fault Description</label>
-<textarea placeholder="Describe the issue..."></textarea>
+<textarea id="fault"></textarea>
 
 <label>Work Completed</label>
-<textarea placeholder="What has been done?"></textarea>
+<textarea id="completed"></textarea>
 
 <label>Outstanding Work</label>
-<textarea placeholder="What still needs to happen?"></textarea>
+<textarea id="outstanding"></textarea>
 
 <label>Parts Required</label>
-<textarea placeholder="Parts, materials or support required"></textarea>
+<textarea id="parts"></textarea>
 
-<label class="priority">Priority</label>
-<select>
-    <option>Priority 1 - Critical</option>
-    <option>Priority 2 - High</option>
-    <option>Priority 3 - Medium</option>
-    <option>Priority 4 - Low</option>
-    <option>Priority 5 - Monitor</option>
+<label>Priority</label>
+<select id="priority">
+<option>P1 - Critical</option>
+<option>P2 - High</option>
+<option>P3 - Medium</option>
+<option>P4 - Low</option>
+<option>P5 - Monitor</option>
 </select>
 
 <label>Completed By</label>
-<input type="text" placeholder="Name">
+<input id="person">
 
-<button>
-Submit Handover
-</button>
+<button onclick="saveHandover()">Save Handover</button>
 
 </div>
+
 
 <div class="card">
-<h3>Current Issues</h3>
 
-<p>🔴 793F-12 Steering Fault</p>
-<p>🟠 Drill 04 Hydraulic Leak</p>
+<h2>Previous Handovers</h2>
+
+<div id="history"></div>
 
 </div>
+
+
+<script>
+
+function saveHandover(){
+
+let handover = {
+equipment: equipment.value,
+location: location.value,
+fault: fault.value,
+completed: completed.value,
+outstanding: outstanding.value,
+parts: parts.value,
+priority: priority.value,
+person: person.value,
+date: new Date().toLocaleString()
+};
+
+let saved = JSON.parse(localStorage.getItem("handovers")) || [];
+
+saved.push(handover);
+
+localStorage.setItem("handovers", JSON.stringify(saved));
+
+alert("Handover Saved");
+
+displayHandovers();
+
+}
+
+
+function displayHandovers(){
+
+let saved = JSON.parse(localStorage.getItem("handovers")) || [];
+
+let output="";
+
+saved.reverse().forEach(h => {
+
+output += `
+<div class="issue">
+<b>${h.equipment}</b><br>
+${h.priority}<br>
+${h.fault}<br>
+<b>Outstanding:</b> ${h.outstanding}<br>
+<small>${h.date} - ${h.person}</small>
+</div>
+`;
+
+});
+
+history.innerHTML = output;
+
+}
+
+displayHandovers();
+
+</script>
+
 
 </body>
 </html>
